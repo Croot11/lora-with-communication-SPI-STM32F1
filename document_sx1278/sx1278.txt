@@ -88,5 +88,24 @@
 
 - void lora_setSpreadingFactor(LoRa* _lora, int sf): thiết lập trải phổ.
 
-- void lora_setOCP(LoRa* _lora, uint8_t current): thiết lập bảo vệ quá dòng.
+- void lora_setPower(LoRa* _lora, uint8_t power): thiết lập công suất.
 
+- void lora_setOCP(LoRa* _lora, uint8_t current): bảo vệ quá dòng.
+
+- void lora_setTO_CRCon(LoRa* _lora): thiết lập thời gian chờ Msb 0xff và bật CRC.
+
+- void lora_setSW(LoRa* _lora, uint8_t syncword): set syncWord
+
+- void lora_writeFifo(LoRa* _lora, uint8_t address, uint8_t* value, uint8_t length): viết dữ liệu cho thanh ghi Fifo.
+
+- uint8_t lora_available(LoRa* _lora):  kiểm tra các thông số đã có hay chưa.
+
+- uint8_t lora_transmit(LoRa* _lora, uint8_t* data, uint8_t length, uint16_t timeout): truyền dữ liệu.
+
+- void lora_starReceive(LoRa* _lora): nhận dữ liệu liên tục.
+
+- uint8_t lora_receive(LoRa* _lora, uint8_t* data, uint8_t length): nhận và ghi dữ liệu vào thanh ghi.
+
+- int lora_getRSSI(LoRa* _lora): đo tín hiệu.
+
+- uint16_t lora_init(LoRa* _lora): khởi tạo.
