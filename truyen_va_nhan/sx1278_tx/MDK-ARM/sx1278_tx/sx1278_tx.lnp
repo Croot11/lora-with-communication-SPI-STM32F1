@@ -1,0 +1,27 @@
+--cpu Cortex-M3
+"sx1278_tx\startup_stm32f103xb.o"
+"sx1278_tx\main.o"
+"sx1278_tx\gpio.o"
+"sx1278_tx\spi.o"
+"sx1278_tx\stm32f1xx_it.o"
+"sx1278_tx\stm32f1xx_hal_msp.o"
+"sx1278_tx\stm32f1xx_hal_gpio_ex.o"
+"sx1278_tx\stm32f1xx_hal_spi.o"
+"sx1278_tx\stm32f1xx_hal.o"
+"sx1278_tx\stm32f1xx_hal_rcc.o"
+"sx1278_tx\stm32f1xx_hal_rcc_ex.o"
+"sx1278_tx\stm32f1xx_hal_gpio.o"
+"sx1278_tx\stm32f1xx_hal_dma.o"
+"sx1278_tx\stm32f1xx_hal_cortex.o"
+"sx1278_tx\stm32f1xx_hal_pwr.o"
+"sx1278_tx\stm32f1xx_hal_flash.o"
+"sx1278_tx\stm32f1xx_hal_flash_ex.o"
+"sx1278_tx\stm32f1xx_hal_exti.o"
+"sx1278_tx\stm32f1xx_hal_tim.o"
+"sx1278_tx\stm32f1xx_hal_tim_ex.o"
+"sx1278_tx\system_stm32f1xx.o"
+"sx1278_tx\sx1278_selfmade.o"
+--strict --scatter "sx1278_tx\sx1278_tx.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "sx1278_tx.map" -o sx1278_tx\sx1278_tx.axf

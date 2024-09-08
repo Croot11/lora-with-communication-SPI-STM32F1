@@ -1,0 +1,92 @@
+----------------------SX1278------------------SEMTECH--
+
+*) giới thiệu.
+- SX1278 là một module RF (Radio Frequency) được sản xuất bởi công ty Semtech, sử dụng công nghệ LoRa (Long Range) để truyền dữ liệu không dây với khoảng cách xa và tiêu thụ năng lượng thấp. 
+- các đặc điểm chính của sx1278:
+	+ Băng tần: Hoạt động ở băng tần 433 MHz, nhưng cũng có thể cấu hình để hoạt động ở các băng tần khác (như 868 MHz, 915 MHz) tùy thuộc vào khu vực và quy định.
+
+	+ Phạm vi truyền: SX1278 có thể truyền dữ liệu ở khoảng cách từ vài kilomet đến vài chục kilomet trong điều kiện lý tưởng.
+
+	+ Công suất phát: Lên đến +20 dBm, giúp tăng phạm vi truyền tín hiệu.
+
+	+ Tốc độ dữ liệu: SX1278 hỗ trợ tốc độ truyền dữ liệu thấp từ 0.018 kbps đến 37.5 kbps, phù hợp với các ứng dụng cần truyền dữ liệu nhỏ nhưng ở khoảng cách xa.
+
+	+ Giao tiếp: SX1278 giao tiếp với vi điều khiển thông qua giao thức SPI, giúp dễ dàng tích hợp với nhiều loại vi điều khiển khác nhau.
+
+	+ Tiêu thụ năng lượng thấp: Là một trong những đặc điểm nổi bật của SX1278, giúp tiết kiệm pin trong các ứng dụng sử dụng pin, như cảm biến không dây.
+
+*) các thanh ghi.
+- RegFifo(0x00): thanh ghi để lưu trữ dữ liệu truyền và nhận.(với bộ đệm 256byte).
+- RegOpMode(0x01): thanh ghi này điều khiển chế độ hoạt động của sx1278.
+	bit7: 0: FSK/OOK, 1: Lora mode.
+      bit2-0: 000: sleep mode, 001:stdby mode, 010: FS mode TX, 011: transmitter mode(Tx), 100: FS mode RX, 101: receiver mode(Rx).
+	STNBY(standby): chế độ tiết kiệm năng lượng khi thiết bị không hoạt động, thời gian khởi động nhanh khi chuyển sang chế độ truyền hoặc nhận, giữ nguyên cấu hình
+
+- RegFrMsb(0x06), RegFrMid(0x07), RegFrLsb(0x08): các thanh ghi này thiết lập tần số hoạt động của sx1278.(primary is set up register RegFrLsb).
+
+- RegPaConfig(0x09): điều khiển công suất
+
+
+- RegOcp(0x0B): điều chỉnh bảo vệ quá dòng cho mạch phát.
+
+- RegLna (0x0C): điều khiển độ khuếch đại của mạch LNA để tối ưu hóa 
+
+- RegFifoTxBaseAddr(0x0E): để xác định địa chỉ bắt đầu của bộ đệm truyền FIFO, giá trị này sẽ xác định địa chỉ trong bộ đệm FIFO nơi dữ liệu sẽ bắt đầu được ghi vào để chuẩn bị cho việc truyền.
+
+- RegFifoAddrPtr(0x0D): thiết lập con trỏ FIFO để chỉ vào địa chỉ bắt đầu của bộ đệm truyền. Như vậy module sẽ biết rằng dữ liệu truyền cần được ghi bắt đầu từ vị trí nào trong bộ đệm FIFO.
+
+- RegFifoRxCurrentAddr(0x10): chứa địa chỉ trong FIFO nơi mà byte dữ liệu tiếp theo cần được đọc trong quá trình nhận dữ liệu.
+
+- RegIrqFlags(0x12): chứa trạng thái các sự kiện ngắt. Đọc giá trị thanh ghi để kiểm tra xem có sự kiện nào xảy ra không(Tx done, Rx done,...). Để clear thì ghi vào thanh ghi là 1.
+
+- RegRxNbBytes(0x13): xác định so bytes đã nhận được và hiện đang nằm trong bộ đệm FIFO.
+
+- RegPktRssiValue(0x1A): cung cấp thông tin về cường độ tín hiệu nhận được, điều này rất hữu ích trong việc đánh giá chất lượng tín hiệu và khả năng nhận tín hiệu từ các gói tin LoRa.
+
+- RegModemConfig1(0x1D), RegModemConfig2(0x1E): các thanh ghi này điều khiển các tham số của chế độ điều chế Lora.
+	+)config1
+	        bandwidth(bit7-4)      : cài đặt băng thông cho Lora.(băng thông cao cho phép truyền dữ liệu nhanh hơn nhưng làm giảm khả năng chống nhiễu).
+		codingrate(bit3-1)     : cài đặt tỷ lệ mã hóa.(tỷ lệ mã hóa càng cao dữ liệu càng an toàn trước nhiễu nhưng tốc độ truyền dữ liệu sẽ chậm hơn).
+	+)config2
+		spreadingFactor(bit7-4): điều chỉnh hệ số trải phổ.(hệ số trải phổ càng cao, tín hiệu càng dễ nhận diện và chống nhiễu càng tốt hơn nhưng tốc độ truyền dữ liệu sẽ chậm hơn).
+		Tx continuous Mode(bit3): chọn chế độ truyền liên tục.
+		Rx Payload CRC On(bit2): bật CRC.
+		Timout (bit0:1)
+
+- RegSymbTimeoutL(0x1F): thanh ghi này chứa thông tin về thời gian chờ cho việc truyền hoặc nhận dữ liệu.
+
+- RegPreambleMsb(0x20), RegPreambleLsb(0x21): set up ký tự gửi đi tối đa là bao nhiêu ký tự max 2^16.
+
+- RegPayloadLength(0x22): thiết lập độ dài của gói dữ liệu cần truyền. 1 điều quan trọng vì nó giúp module lora biết cần phải lấy bao nhiêu dữ liệu từ bộ đệm FIFO để truyền.
+
+- RegModemConfig3(0x26): thanh ghi để bật bit 3 để tối ưu hóa tốc độ dữ liệu thấp và tự động điều chỉnh độ lợi (AGC).
+
+- RegDioMapping1(0x40): dùng thiết lập các chân Dio khi có các sự kiện xảy ra như đã nhận hoặc truyền dữ liệu.
+
+*) xây dựng các hàm.
+	với giao tiếp spi với 1 số slave sẽ cần set bit cao để hiểu là đọc hay ghi dữ liệu.
+
+- LoRa default_lora(): thiết lập giá trị mặc định.
+
+- void LoRa_reset(LoRa* _lora): hàm reset sx1278.
+
+- void lora_readReg(LoRa* _lora, uint8_t* address, uint16_t g_length, uint8_t* doc, uint16_t r_length): hàm đọc 1 thanh ghi với độ dài gửi đi và lưu trữ giá trị vào *doc với độ dài nhận.
+
+- uint8_t lora_read(LoRa* _lora, uint8_t address): set bit 7 = 0 để  đọc dữ liệu thanh ghi và trả về giá trị đọc được.
+
+- void lora_writeReg(LoRa* _lora, uint8_t* address, uint16_t g_length, uint8_t* ghi, uint16_t r_length): hàm truyền dữ liệu và ghi dữ liệu vào thanh ghi. 
+
+- void lora_write(LoRa* _lora, uint8_t address, uint8_t value): set bit 7 = 1 để ghi dữ liệu vào thanh ghi.
+
+- void LoRa_mode(LoRa* _lora, int mode): chọn các chế độ.
+
+- void lora_lowDataRateOpt(LoRa* _lora, uint8_t value): chọn chế độ tối ưu hóa tốc độ gửi dữ liệu. Bắt buộc khi độ dài ký tự vượt quá 16ms.
+
+- void lora_setAutoLDO(LoRa* _lora): kiểm tra xem tốc độ dữ liệu có vượt quá 16ms hay không để tự động bật chế độ tối ưu hóa.
+
+- void lora_setFreq(LoRa* _lora, int freq): thiết lập tần số sóng. Trong sx1278 đã có sẵn 1 tần số riêng là 32Mhz, công thức tính F = (freq * 2^19)/32.
+
+- void lora_setSpreadingFactor(LoRa* _lora, int sf): thiết lập trải phổ.
+
+- void lora_setOCP(LoRa* _lora, uint8_t current): thiết lập bảo vệ quá dòng.
+

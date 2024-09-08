@@ -1,0 +1,86 @@
+*) giới thiệu về SPI.
+		SCLK -> SCLK
+		MOSI -> MOSI
+		MISO -> MISO
+		SS   -> SS
+	trong đó: MOSI master gửi dữ liệu đến slave.
+		  MISO slave gửi dữ liệu cho master.
+ 		  SCLK xung giữ nhịp clock.
+		  SS/CS master chọn slave để giao tiếp, master điều khiển tín hiệu mức logic của slave nào xuống LOW nghĩa là master đang giao tiếp với slave đó.
+
+- mỗi thiết bị master và slave đều có một thanh ghi dịch 8 bits, master truyền đi 8 bits dữ liệu vào thanh ghi dịch của nó, sau đó 8 bits dữ liệu được truyền theo đường tín hiệu MOSI sang thiết bị slave. Tương tự khi slave truyền dữ liệu, các bits trên thanh ghi dịch của slave truyền đến master thông qua đường tín hiệu MISO.
+  bằng cách này, dữ liệu của 2 thanh ghi sẽ được trao đổi cùng một lúc nên tốc độ truyền dữ liệu rất nhanh.
+
+- có thể làm việc ở 3 chế độ: polling, interrupt, DMA.
+- các thanh ghi SPI_CR1, SPI_CR2, SPI_SR cho phép cấu hình và trạng thái.
+
+*) các thanh ghi quan trọng của SPI.
+- SPI_CR1(control register): thiết lập, cấu hình hay vô hiệu các chế độ nhận dữ liệu. Cấu hình khung kích thước dữ liệu.
+	BR[2:0]: đặt tốc độ baud rate.
+	MSTR: chọn chế độ master/slave (1 master, 0 slave).
+	CPOL: thiết lập mức tín hiệu clock giống như thiết lập mức cao hay thấp cho 1 chân GPIO. Khi bắt đầu 1 chu kỳ truyền sẽ thay đổi mức.
+	CPHA: chọn cạnh xung clock để lấy dữ liệu(0: lấy cạnh lên, 1: lấy cạnh xuống). Nói chung là sẽ lấy cạnh thứ 2 khi ở mức 1 và nó sẽ cho phép thêm thời gian trước khi dữ liệu được mẫu, tránh tình trạng chưa sẵn sàng dẫn đến lỗi.
+	DFF: định nghĩa độ dài dữ liệu(0: 8-bit, 1: 16-bit).
+	LSBFIRST: chọn thứ tự truyền dữ liệu(0: MSB trước, 1: LSB trước). MSB sẽ truyền dữ liệu quan trọng nhất trước bit cao nhất rồi đến bit thấp và ngược lại LSB sẽ truyền bit thấp trước đến bit cao(việc này để giúp tương thích với yêu cầu của thích bị sẽ là MSB hay LSB).
+	SSI: chọn giá trị của bit NSS để chọn thiết bị hoạt động trong chế độ master.
+	SSM: kích hoạt chế độ quản lí phần mềm của NSS(0: NSS sẽ được điều khiển bởi phần cứng, 1: NSS sẽ được điều khiển bởi phần mềm).
+
+- SPI_CR2: các ngắt khi xảy ra một sự kiện nào đó.
+	TXEIE: kích hoạt ngắt khi bộ đệm truyền rỗng.
+	RXNEIE: kích hoạt bộ ngắt khi bộ đệm nhận đầy.
+	ERRIE: kích hoạt ngắt khi có lỗi.
+	SSOE: kích hoạt chân NSS trong chế độ Master.
+	FRF: chọn định dạng frame(0: motorola, 1: TI).
+	TXDMAEN: kích hoạt DMA cho truyền.
+	RXDMAEN: kích hoạt DMA cho nhận.
+- SPI_SR(status register): các cờ báo trạng thái.
+	RXNE: Cờ báo nhận dữ liệu (1: dữ liệu đã sẵn sàng trong bộ đệm nhận).
+	TXE: Cờ báo truyền dữ liệu (1: bộ đệm truyền rỗng).
+	BSY: Cờ báo SPI đang bận (1: SPI đang hoạt động).
+	OVR: Cờ báo lỗi tràn dữ liệu (Overrun).
+	MODF: Cờ báo lỗi chế độ (Mode Fault).
+	CRCERR: Cờ báo lỗi CRC.
+
+- SPI_DR(data register): thanh ghi dữ liệu 16bits chia làm hai bộ đệm. Bao gồm bộ đệm chứa dữ liệu đã nhận được và bộ đếm chứa dữ liệu sẽ được truyền đi.
+
+- SPI_CRCPR(polynomial register): Thanh ghi này chứa giá trị đa thức CRC, được sử dụng để tính toán CRC trong quá trình truyền dữ liệu.
+
+- SPI_RXCRCR: thanh ghi chứa giá trị CRC đã nhận.
+
+- SPI_TXCRCR: thanh ghi chứa giá trị CRC đã truyền.
+
+*) các chế độ mode trong CubeMX.
+- full duplex mode(chế độ song công toàn phần): 
+
+- half duplex mode(chế độ bán song công): truyền và nhận dữ liệu sử dụng chung một đường dây. Dữ liệu chỉ có thể truyền hoặc nhận tại một thời điểm.(MOSI or MISO).
+
+*) các hàm HAL 
+- HAL_SPI_Transmit(_LoRa->hSPIx, address, r_length, TRANSMIT_TIMEOUT): address(*pData) đây là con trỏ tới bộ nhớ dữ liệu cần truyền, r_length số byte cần truyền đi.
+
+- HAL_SPI_GetState(_LoRa->hSPIx) != HAL_SPI_STATE_READY: hàm đọc trạng thái kiểm tra xem SPI đã sẵn sàng trước khi thực hiện các thao tác tiếp theo(HAL_SPI_STATE_READY trạng ready kiểm tra 2 thanh ghi TXE vs RXNE trong thanh ghi SPI_SR)
+
+- HAL_SPI_Receive(_LoRa->hSPIx, output, w_length, RECEIVE_TIMEOUT): dùng để nhận dữ từ một thiết bị SPI slave. biến output(*pData) con trỏ tới mảng để lưu trữ dữ liệu nhận được từ slave. w_length chỉ ra số byte muốn nhận và lưu trữ.
+
+- void LoRa_write(LoRa* _LoRa, uint8_t address, uint8_t value){
+	uint8_t data;
+	uint8_t addr;
+
+	addr = address | 0x80;
+	data = value;
+	LoRa_writeReg(_LoRa, &addr, 1, &data, 1);
+	//HAL_Delay(5);
+}
+
+uint8_t LoRa_read(LoRa* _LoRa, uint8_t address){
+	uint8_t read_data;
+	uint8_t data_addr;
+
+	data_addr = address & 0x7F;
+	LoRa_readReg(_LoRa, &data_addr, 1, &read_data, 1);
+	//HAL_Delay(5);
+
+	return read_data;
+}
+
+2 hàm này data_addr = address & 0x7F; addr = address | 0x80; để thông báo rằng lệnh này là hàm ghi hay hàm đọc dựa vào bit 7 nếu là 1 sẽ ghi còn 0 sẽ đọc.
+
