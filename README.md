@@ -7,7 +7,7 @@ Author: Dương Xuân Ngọc.
 - bảo vệ quá dòng.
 - chế độ ngủ để tiết kiệm năng lượng.
 - dễ dàng sử dụng.
-## **phần cứng**
+## **Phần cứng**
 - module lora ra-01 sx1278.
 <div align="center">
   <img src="ra_01.jpg" alt="GitHub logo" width="300"/>
